@@ -1,25 +1,47 @@
 /*
-M1STY ver 0.9
+M1STY ver 1.0
 
 By XiEn1847
-Finished at [2021/10/11 22:01]
-*/
+Finished at [2021/10/14 21:25]
 
+README
+
+按 Alt + 0,1,8,9 对当前窗口进行不同程度的透明化
+按 Alt + '+' 或 '-' 微调
+按 Alt + '~' 禁止调整某个窗口，并把它变回不透明
+按 Alt + '[' 允许 / 禁止透过窗口点击
+按 Alt + ']' 开启 / 关闭窗口置顶
+
+单击这个窗口之后，按 Alt + '\' 将其隐藏。
+** 注意！！！只能隐藏，不能显示，而且不保证对其他窗口无效！！！
+
+按 Alt + 退格(backspace)结束程序
+** 这在任何情况下有效。
+
+v1.0: 修复了透明度突然变化的bug
+
+*/
+#include <iostream>
+#include <bitset>
 #include <stdio.h>
 #include <conio.h>
 #include <windows.h>
 
+// #define _WIN32_WINNT 0x0601
+// Windows 7
 
 using namespace std;
 
 
+long unsigned XE_LWA_ALPHA=0x00000002;
+long unsigned *Pt__XE_LWA_ALPHA=&XE_LWA_ALPHA;
 int main(){
 	RECT rect;
 	HWND hwnd=NULL,oldhwnd=NULL;
 
 	int numkey[4]={48,49,56,57}; // '0','1','8','9'
 	int numAlpha[10]={1+254*0/9,1+254*1/9,1+254*8/9,1+254*9/9};
-	int Alpha=255;
+	unsigned char Alpha=255;
 	puts("Press Alt + Num { 0,1,8,9 } to Set Opacity.\n");
 	puts("Press Alt + { + } / { - } to Increase / Decrease Opacity.\n");
 	puts("Press Alt + { ~ } to Protect a Window From Control.");
@@ -38,7 +60,8 @@ int main(){
 		if(GetKeyState(18)<0){ 
 			hwnd=GetForegroundWindow();
 			if(hwnd!=oldhwnd){
-				Alpha=255;
+			//	Alpha=255;
+				GetLayeredWindowAttributes(hwnd,NULL,&Alpha,Pt__XE_LWA_ALPHA);
 				DWORD dwExStyle=GetWindowLong(hwnd,GWL_EXSTYLE);
 				if(!(dwExStyle&0x80000))
 					SetWindowLong(hwnd,GWL_EXSTYLE,dwExStyle|0x80000);
@@ -48,7 +71,7 @@ int main(){
 			// Key '+' Increases Alpha
 			if(GetKeyState(187)<0){
 				int spamA=0;
-				if(Alpha<=252)Alpha+=3;
+				if(Alpha<=253)Alpha+=2;
 				else Alpha=255;
 				SetLayeredWindowAttributes(hwnd,0,Alpha,LWA_ALPHA);
 				do{
@@ -65,7 +88,7 @@ int main(){
 			// Key '-' Decreases Alpha
 			if(GetKeyState(189)<0){
 				int spamB=0;
-				if(Alpha>=4)Alpha-=3;
+				if(Alpha>=3)Alpha-=2;
 				else Alpha=1;
 				SetLayeredWindowAttributes(hwnd,0,Alpha,LWA_ALPHA);
 				do{
